@@ -1,0 +1,139 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-hanken);
+  --font-mono: var(--font-geist-mono);
+  --font-hanken: var(--font-hanken);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-foreground: var(--tertiary-foreground);
+  
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.6);
+}
+
+:root {
+  --background: #f8fafc;
+  --foreground: #020617;
+  --card: #ffffff;
+  --card-foreground: #020617;
+  --popover: #ffffff;
+  --popover-foreground: #020617;
+  --primary: #0f172a;
+  --primary-foreground: #f8fafc;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --tertiary: #10b981;
+  --tertiary-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --error: #ef4444;
+  --error-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0f172a;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: #051424;
+  --foreground: #d4e4fa;
+  --card: #122131;
+  --card-foreground: #d4e4fa;
+  --popover: #0d1c2d;
+  --popover-foreground: #d4e4fa;
+  --primary: #bec6e0;
+  --primary-foreground: #131b2e;
+  --secondary: #3e495d;
+  --secondary-foreground: #d8e3fb;
+  --tertiary: #3cddc7;
+  --tertiary-foreground: #00201c;
+  --muted: #1c2b3c;
+  --muted-foreground: #909097;
+  --accent: #273647;
+  --accent-foreground: #d4e4fa;
+  --error: #ffb4ab;
+  --error-foreground: #690005;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: #3cddc7;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button, [role="button"] {
+    @apply cursor-pointer;
+  }
+}
+
+/* Glassmorphism Classes */
+@layer components {
+  .glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .glass-button-secondary {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .glow-text {
+    text-shadow: 0 0 20px rgba(60, 221, 199, 0.4);
+  }
+
+  .gradient-text {
+    background: linear-gradient(to right, #3cddc7, #bec6e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Background Blobs */
+.bg-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  z-index: -1;
+  pointer-events: none;
+}
+.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background-color: #3cddc7; }
+.blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background-color: #bec6e0; }

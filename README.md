@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌌 Finhub
 
-## Getting Started
+**Finhub** é uma plataforma premium de controle financeiro pessoal, projetada com uma estética de **Glassmorphism** de ponta e focada em proporcionar uma experiência visual clara, dinâmica e sofisticada. 
 
-First, run the development server:
+O projeto, codinome **FINHUB**, vai além de uma simples planilha de gastos; ele é um dashboard inteligente que oferece saúde financeira através de cores, micro-animações e cálculos automáticos em tempo real.
 
+---
+
+## 🚀 Visão Geral
+
+- **Mobile-First:** Projetado especificamente para uma usabilidade perfeita em dispositivos móveis.
+- **layered Intelligence:** Interface baseada em camadas de vidro fosco, reduzindo a carga cognitiva e destacando o que realmente importa: seus dados.
+- **Saúde Visual:** Alertas visuais baseados em cores que indicam instantaneamente o status da sua saúde financeira.
+
+## 🛠️ Stack Tecnológica
+
+O Finhub utiliza as tecnologias mais modernas do ecossistema web:
+
+### Frontend
+- **Framework:** [Next.js](https://nextjs.org) (App Router)
+- **Estilização:** [Tailwind CSS](https://tailwindcss.com)
+- **Tipagem:** [TypeScript](https://www.typescriptlang.org)
+- **Gerenciamento de Estado:** [Zustand](https://zustand-demo.pmnd.rs/)
+
+### Backend
+- **Framework:** [AdonisJS 6](https://adonisjs.com) (API Mode)
+- **ORM:** [Lucid ORM](https://lucid.adonisjs.com)
+- **Banco de Dados:** [PostgreSQL](https://www.postgresql.org)
+- **Runtime:** Node.js v24+
+
+---
+
+## 🌟 Funcionalidades Principais
+
+- **📅 Meses Dinâmicos:** Sistema anual expansível (Jan-Dez) com isolamento total de cálculos por período.
+- **💳 Módulo de Cartões:** Gestão de múltiplos cartões personalizados, com controle de vencimento e gastos específicos por cartão.
+- **💰 Gestão de Renda:** Campo dedicado para aportes mensais com representação visual de progresso no dashboard.
+- **📊 Cálculos Real-time:** Processamento instantâneo de valores assim que são inseridos.
+- **🏷️ Categorização Inteligente:** Áreas dedicadas para Assinaturas, Gastos Essenciais, Lazer e muito mais.
+
+---
+
+## ⚙️ Como Executar o Projeto
+
+Este projeto é um monorepo que contém tanto o backend quanto o frontend na mesma estrutura de pastas.
+
+### 1. Clonar o repositório
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/seu-usuario/fin_hub.git
+cd fin_hub
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configurar o Backend
+```bash
+cd backend
+npm install
+# Configure seu arquivo .env com as credenciais do PostgreSQL
+node ace migration:run
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Configurar o Frontend
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🎨 Design System
 
-To learn more about Next.js, take a look at the following resources:
+O Finhub utiliza o sistema de design **Aura**, focado em:
+- **Cores:** Deep Navy foundation, Teal-to-Emerald para crescimento e Soft Rose para alertas.
+- **Tipografia:** Hanken Grotesk para máxima legibilidade de dados.
+- **Efeitos:** Backdrop blur (20px a 40px) e brilhos internos para simular vidro real.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Desenvolvido com ❤️ por **Gastos**.
