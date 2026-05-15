@@ -73,9 +73,11 @@ export default function HistoryPage() {
 
   const filtered = transactions.filter(t => {
     const d = new Date(t.date)
+    const categoryName = (typeof t.category === 'object' ? t.category?.name : t.category) || 'Outros'
+    
     return (
       (t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.category.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (categoryName && categoryName.toLowerCase().includes(searchTerm.toLowerCase()))) &&
       (filterDay === "" || d.getDate() === parseInt(filterDay)) &&
       (filterMonth === "all" || d.getMonth() + 1 === parseInt(filterMonth)) &&
       (filterYear === "all" || d.getFullYear() === parseInt(filterYear))
@@ -262,7 +264,7 @@ export default function HistoryPage() {
                           color: 'rgba(212,228,250,0.5)',
                         }}
                       >
-                        {t.category}
+                        {(typeof t.category === 'object' ? t.category?.name : t.category) || 'Outros'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

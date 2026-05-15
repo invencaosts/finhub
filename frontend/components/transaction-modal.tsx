@@ -73,7 +73,7 @@ export function TransactionModal({ type, children, initialData, open: externalOp
         setDisplayAmount(initialAmount)
         
         const catName = typeof initialData.category === 'object' 
-          ? (initialData.category as any)?.name 
+          ? initialData.category?.name 
           : initialData.category
         setCategory(catName || "")
         
@@ -237,47 +237,62 @@ export function TransactionModal({ type, children, initialData, open: externalOp
                 <Label>{type === 'income' ? 'Frequência' : 'Tipo de Lançamento'}</Label>
                 <RadioGroup 
                   value={recurrenceMode} 
-                  onValueChange={(val: any) => setRecurrenceMode(val)}
+                  onValueChange={(val: any) => {
+                    setRecurrenceMode(val)
+                    if (val === 'fixed') setTotalInstallments("60")
+                    else setTotalInstallments("1")
+                  }}
                   className="flex gap-4"
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="installment" id="installment" />
                     <Label htmlFor="installment" className="font-normal cursor-pointer">
-                      {type === 'income' ? 'Mensal' : 'Parcelar Valor'}
+                      {type === 'income' ? 'Mensalmente' : 'Parcelar Valor'}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="fixed" id="fixed" />
                     <Label htmlFor="fixed" className="font-normal cursor-pointer">
-                      Repetir Valor Integral
+                      Repetir para sempre
                     </Label>
                   </div>
                 </RadioGroup>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="installments">Duração (Meses)</Label>
-                <Select value={totalInstallments} onValueChange={(val) => setTotalInstallments(val || "1")}>
-                  <SelectTrigger className="input-standard h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1c2b3c] border-white/20 shadow-2xl">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 18, 24, 36, 48].map(n => (
-                      <SelectItem key={n} value={n.toString()}>{n} mês{n > 1 ? 'es' : ''}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                {parseInt(totalInstallments) > 1 && displayAmount && (
-                  <p className="text-[11px] text-tertiary font-bold bg-tertiary/10 p-2 rounded-lg border border-tertiary/20">
-                    <span className="material-symbols-outlined text-[14px] align-middle mr-1">info</span>
-                    {recurrenceMode === 'fixed' || type === 'income'
-                      ? `Serão lançados R$ ${displayAmount} integralmente todos os meses por ${totalInstallments} meses.`
-                      : `O valor de R$ ${displayAmount} será dividido em ${totalInstallments} parcelas de R$ ${(parseFloat(displayAmount.replace(/\./g, '').replace(',', '.')) / parseInt(totalInstallments)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-                    }
-                  </p>
-                )}
-              </div>
+              {recurrenceMode === 'installment' && (
+                <div className="space-y-2">
+                  <Label htmlFor="installments">Duração (Meses)</Label>
+                  <Select value={totalInstallments} onValueChange={(val) => setTotalInstallments(val || "1")}>
+                    <SelectTrigger className="input-standard h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1c2b3c] border-white/20 shadow-2xl">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 18, 24, 36, 48].map(n => (
+                        <SelectItem key={n} value={n.toString()}>{n} mês{n > 1 ? 'es' : ''}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  {parseInt(totalInstallments) > 1 && displayAmount && (
+                    <p className="text-[11px] text-tertiary font-bold bg-tertiary/10 p-2 rounded-lg border border-tertiary/20">
+                      <span className="material-symbols-outlined text-[14px] align-middle mr-1">info</span>
+                      {type === 'income'
+                        ? `Esta receita será lançada mensalmente por ${totalInstallments} meses.`
+                        : `O valor de R$ ${displayAmount} será dividido em ${totalInstallments} parcelas de R$ ${(parseFloat(displayAmount.replace(/\./g, '').replace(',', '.')) / parseInt(totalInstallments)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                      }
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {recurrenceMode === 'fixed' && displayAmount && (
+                <p className="text-[11px] text-tertiary font-bold bg-tertiary/10 p-3 rounded-lg border border-tertiary/20 flex items-start gap-2">
+                  <span className="material-symbols-outlined text-[16px] mt-0.5">repeat</span>
+                  <span>
+                    Este valor de <strong>R$ {displayAmount}</strong> será repetido mensalmente para sempre (gerado automaticamente para os próximos 5 anos).
+                  </span>
+                </p>
+              )}
             </div>
 
             <DialogFooter className="pt-6 flex flex-row gap-3">

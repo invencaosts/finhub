@@ -67,36 +67,49 @@ export default class TransactionsController {
     const startDate = DateTime.fromISO(date)
     const parsedRecurrenceEndAt = recurrenceEndAt ? DateTime.fromISO(recurrenceEndAt) : undefined
 
-    // Create first record
-    const firstTransaction = await Transaction.create({
-      ...rest,
-      amount: installmentAmount.toFixed(2),
-      userId: user.id,
-      date: startDate,
-      recurrenceEndAt: parsedRecurrenceEndAt,
-      currentInstallment: 1,
-      totalInstallments: totalInstallments,
-      recurrenceMode: rest.recurrenceMode || (rest.type === 'income' ? 'fixed' : 'installment')
-    })
+    try {
+      // Create first record
+      const firstTransaction = await Transaction.create({
+        ...rest,
+        amount: installmentAmount.toFixed(2),
+        userId: user.id,
+        date: startDate,
+        recurrenceEndAt: parsedRecurrenceEndAt,
+        currentInstallment: 1,
+        totalInstallments: totalInstallments,
+        recurrenceMode: rest.recurrenceMode || (rest.type === 'income' ? 'fixed' : 'installment')
+      })
 
-    // Create subsequent records
-    if (totalInstallments > 1) {
-      for (let i = 1; i < totalInstallments; i++) {
-        await Transaction.create({
-          ...rest,
-          amount: installmentAmount.toFixed(2),
-          userId: user.id,
-          date: startDate.plus({ months: i }),
-          recurrenceEndAt: parsedRecurrenceEndAt,
-          currentInstallment: i + 1,
-          totalInstallments: totalInstallments,
-          parentId: firstTransaction.id.toString(),
-          recurrenceMode: rest.recurrenceMode || (rest.type === 'income' ? 'fixed' : 'installment')
-        })
+      // Create subsequent records
+      if (totalInstallments > 1) {
+        for (let i = 1; i < totalInstallments; i++) {
+          await Transaction.create({
+            ...rest,
+            amount: installmentAmount.toFixed(2),
+            userId: user.id,
+            date: startDate.plus({ months: i }),
+            recurrenceEndAt: parsedRecurrenceEndAt,
+            currentInstallment: i + 1,
+            totalInstallments: totalInstallments,
+            parentId: firstTransaction.id.toString(),
+            recurrenceMode: rest.recurrenceMode || (rest.type === 'income' ? 'fixed' : 'installment')
+          })
+        }
       }
-    }
 
-    return response.created(firstTransaction)
+      if (firstTransaction.categoryId) {
+        await firstTransaction.load('category')
+      }
+      
+      return response.created(firstTransaction)
+    } catch (error) {
+      console.error('Error creating transaction:', error)
+      return response.internalServerError({
+        message: 'Erro ao criar transação',
+        error: error.message,
+        stack: error.stack
+      })
+    }
   }
 
   /**
@@ -119,6 +132,7 @@ export default class TransactionsController {
     })
     
     await transaction.save()
+    await transaction.load('category')
     return response.ok(transaction)
   }
 

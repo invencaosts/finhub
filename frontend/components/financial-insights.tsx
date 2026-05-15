@@ -72,12 +72,18 @@ export function FinancialInsights() {
   const categoryData = useMemo(() => {
     const expenses = transactions.filter(t => t.type === 'expense')
     const grouped = expenses.reduce((acc, t) => {
-      const catName = typeof t.category === 'object' ? (t.category as any)?.name : (t.category || "Outros")
-      acc[catName] = (acc[catName] || 0) + t.amount
+      const catName = (typeof t.category === 'object' ? (t.category as any)?.name : t.category) || "Outros"
+      const catColor = typeof t.category === 'object' ? (t.category as any)?.color : null
+      
+      if (!acc[catName]) {
+        acc[catName] = { value: 0, color: catColor }
+      }
+      acc[catName].value += t.amount
       return acc
-    }, {} as Record<string, number>)
+    }, {} as Record<string, { value: number; color: string | null }>)
+    
     return Object.entries(grouped)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, data]) => ({ name, value: data.value, color: data.color }))
       .sort((a, b) => b.value - a.value)
   }, [transactions])
 
@@ -176,8 +182,11 @@ export function FinancialInsights() {
                       dataKey="value"
                       strokeWidth={0}
                     >
-                      {categoryData.map((_, index) => (
-                        <Cell key={index} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                      {categoryData.map((entry, index) => (
+                        <Cell 
+                          key={index} 
+                          fill={entry.color || CATEGORY_COLORS[index % CATEGORY_COLORS.length]} 
+                        />
                       ))}
                     </Pie>
                     <Tooltip content={<CustomTooltip />} />
@@ -185,11 +194,14 @@ export function FinancialInsights() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="mt-4 space-y-2 flex-1 overflow-hidden">
-                {categoryData.slice(0, 4).map((entry, i) => (
-                  <div key={entry.name} className="flex items-center justify-between">
+              <div className="mt-4 space-y-2 flex-1 overflow-y-auto pr-2 custom-scrollbar" style={{ maxHeight: '200px' }}>
+                {categoryData.map((entry, i) => (
+                  <div key={entry.name} className="flex items-center justify-between py-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} />
+                      <div 
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0" 
+                        style={{ background: entry.color || CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} 
+                      />
                       <span className="text-xs truncate" style={{ color: 'rgba(212,228,250,0.55)' }}>{entry.name}</span>
                     </div>
                     <span className="text-xs font-bold flex-shrink-0 ml-2" style={{ color: '#d4e4fa' }}>
@@ -228,7 +240,9 @@ export function FinancialInsights() {
                       </span>
                       <div className="min-w-0">
                         <p className="text-xs font-bold truncate" style={{ color: '#d4e4fa' }}>{t.description}</p>
-                        <p className="text-[10px] uppercase tracking-wide" style={{ color: 'rgba(212,228,250,0.3)' }}>{t.category}</p>
+                        <p className="text-[10px] uppercase tracking-wide" style={{ color: 'rgba(212,228,250,0.3)' }}>
+                          {(typeof t.category === 'object' ? t.category?.name : t.category) || 'Outros'}
+                        </p>
                       </div>
                     </div>
                     <span className="text-xs font-black flex-shrink-0 ml-3" style={{ color: '#d4e4fa' }}>
@@ -315,6 +329,93 @@ export function FinancialInsights() {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Credit Card Limits */}
+      <div className="lg:col-span-12" style={glassStyle}>
+        <div className="p-6">
+          <SectionTitle icon="credit_card" title="Uso do Limite de Crédito" subtitle="Crédito consumido vs. Disponível (considerando parcelas futuras)" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {useFinanceStore.getState().cards.map(card => {
+              // Logic: Consumed credit is the sum of all installments from the selected month onwards
+              // We use allTransactions to see the full picture of installments
+              const cardTransactions = allTransactions.filter(t => t.creditCardId === card.id)
+              
+              // Find the reference date (start of current selected month)
+              // Since 'transactions' in store are filtered for current month, 
+              // we can use the date of any transaction in 'transactions' or just new Date()
+              // Actually, we should use the global selected month/year.
+              // For simplicity, let's assume we want the status as of TODAY or the selected month.
+              
+              // Let's use the current date of the first transaction in the month or today
+              const refDate = transactions.length > 0 ? new Date(transactions[0].date) : new Date()
+              refDate.setDate(1) // Start of month
+              refDate.setHours(0, 0, 0, 0)
+
+              const consumed = cardTransactions
+                .filter(t => new Date(t.date) >= refDate)
+                .reduce((sum, t) => sum + t.amount, 0)
+              
+              const limit = card.limit
+              const available = Math.max(0, limit - consumed)
+              const consumedPct = Math.min(100, (consumed / limit) * 100)
+              
+              return (
+                <div key={card.id} className="space-y-4 p-5 rounded-2xl bg-white/[0.03] border border-white/5 relative overflow-hidden group">
+                   <div 
+                    className="absolute -right-4 -top-4 w-20 h-20 rounded-full opacity-10 blur-2xl transition-opacity group-hover:opacity-20"
+                    style={{ background: consumedPct > 80 ? '#ffb4ab' : '#3cddc7' }}
+                  />
+                  
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-black" style={{ color: '#d4e4fa' }}>{card.name}</p>
+                      <p className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(212,228,250,0.3)' }}>{card.bankName || 'Cartão'}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold" style={{ color: consumedPct > 80 ? '#ffb4ab' : '#3cddc7' }}>
+                        {Math.round(consumedPct)}% usado
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="h-2.5 rounded-full overflow-hidden bg-white/5 flex">
+                      <div 
+                        className="h-full rounded-full transition-all duration-1000"
+                        style={{ 
+                          width: `${consumedPct}%`, 
+                          background: consumedPct > 80 ? 'linear-gradient(90deg, #ffb4ab, #ff8a7a)' : 'linear-gradient(90deg, #3cddc7, #28c4b0)'
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[11px] font-medium">
+                      <span style={{ color: 'rgba(212,228,250,0.4)' }}>
+                        Consumido: <strong style={{ color: '#d4e4fa' }}>R$ {consumed.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</strong>
+                      </span>
+                      <span style={{ color: 'rgba(212,228,250,0.4)' }}>
+                        Livre: <strong style={{ color: '#3cddc7' }}>R$ {available.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-white/5 flex justify-between items-center">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/20">Limite Total</span>
+                    <span className="text-xs font-black" style={{ color: '#d4e4fa' }}>R$ {limit.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</span>
+                  </div>
+                </div>
+              )
+            })}
+            
+            {useFinanceStore.getState().cards.length === 0 && (
+              <div className="col-span-full py-10 flex flex-col items-center justify-center gap-3 border-2 border-dashed border-white/5 rounded-2xl">
+                <span className="material-symbols-rounded text-3xl opacity-20">add_card</span>
+                <p className="text-sm font-bold text-white/20 uppercase tracking-widest">Nenhum cartão cadastrado</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

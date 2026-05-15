@@ -21,7 +21,7 @@ function formatCurrency(value: number, decimals = 2) {
   return value.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
 }
 
-function CategoryIcon({ category, type }: { category: string; type: string }) {
+function CategoryIcon({ category, type }: { category: string | any; type: string }) {
   const iconMap: Record<string, string> = {
     alimentação: 'restaurant',
     mercado: 'shopping_cart',
@@ -36,7 +36,8 @@ function CategoryIcon({ category, type }: { category: string; type: string }) {
     freelance: 'work',
     investimento: 'trending_up',
   }
-  const key = category?.toLowerCase()
+  const categoryName = typeof category === 'object' ? category?.name : (category || 'Outros')
+  const key = categoryName?.toLowerCase()
   const icon = iconMap[key] || (type === 'income' ? 'add_circle' : 'remove_circle')
   return (
     <span className="material-symbols-rounded text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -360,7 +361,9 @@ export default function DashboardPage() {
                         {item.description}
                       </p>
                       <p className="text-[11px] mt-0.5 flex items-center gap-1.5" style={{ color: 'rgba(212,228,250,0.35)' }}>
-                        <span className="uppercase tracking-wide">{item.category}</span>
+                        <span className="uppercase tracking-wide">
+                          {(typeof item.category === 'object' ? item.category?.name : item.category) || 'Outros'}
+                        </span>
                         <span>·</span>
                         <span>{new Date(item.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
                         {item.creditCardId && (
