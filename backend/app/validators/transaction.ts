@@ -11,5 +11,9 @@ export const createTransactionValidator = vine.compile(
     totalInstallments: vine.number().min(1).optional(),
     currentInstallment: vine.number().min(1).optional(),
     categoryId: vine.number().optional(),
+    isRecurring: vine.boolean().optional(),
+    frequency: vine.string().optional(),
+    recurrenceEndAt: vine.string().optional(),
+    recurrenceMode: vine.enum(['fixed', 'installment']).optional(),
   })
 )

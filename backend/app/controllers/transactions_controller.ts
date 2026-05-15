@@ -9,8 +9,8 @@ export default class TransactionsController {
    */
   async index({ auth, request, response }: HttpContext) {
     const user = auth.user!
-    const month = request.input('month')
-    const year = request.input('year')
+    const month = parseInt(request.input('month'))
+    const year = parseInt(request.input('year'))
 
     let query = Transaction.query().where('userId', user.id).preload('category')
 
@@ -20,7 +20,32 @@ export default class TransactionsController {
     }
 
     const transactions = await query.orderBy('date', 'desc')
-    return response.ok(transactions)
+
+    // Calculate Carried Over Balance (Saldo que vem dos meses anteriores)
+    let carriedOverBalance = 0
+    if (month && year) {
+      const firstDayOfMonth = DateTime.local(year, month, 1).toSQLDate()
+      
+      const previousIncomes = await Transaction.query()
+        .where('userId', user.id)
+        .where('type', 'income')
+        .where('date', '<', firstDayOfMonth!)
+        .sum('amount as total')
+      
+      const previousExpenses = await Transaction.query()
+        .where('userId', user.id)
+        .where('type', 'expense')
+        .where('date', '<', firstDayOfMonth!)
+        .sum('amount as total')
+
+      carriedOverBalance = (parseFloat(previousIncomes[0].$extras.total || 0)) - 
+                           (parseFloat(previousExpenses[0].$extras.total || 0))
+    }
+
+    return response.ok({
+      transactions,
+      carriedOverBalance
+    })
   }
 
   /**
@@ -28,16 +53,50 @@ export default class TransactionsController {
    */
   async store({ auth, request, response }: HttpContext) {
     const user = auth.user!
-    const data = await request.validateUsing(createTransactionValidator)
+    const { recurrenceEndAt, date, ...rest } = await request.validateUsing(createTransactionValidator)
 
-    const transaction = await Transaction.create({
-      ...data,
-      amount: data.amount.toString(),
+    const totalInstallments = rest.totalInstallments || 1
+    const rawAmount = parseFloat(rest.amount.toString())
+    
+    // Logic: 
+    // If recurrenceMode is 'fixed' or it's an 'income', we repeat the full amount.
+    // If recurrenceMode is 'installment' (default for expense), we divide the amount.
+    const isFixed = rest.recurrenceMode === 'fixed' || rest.type === 'income'
+    const installmentAmount = isFixed ? rawAmount : (rawAmount / totalInstallments)
+    
+    const startDate = DateTime.fromISO(date)
+    const parsedRecurrenceEndAt = recurrenceEndAt ? DateTime.fromISO(recurrenceEndAt) : undefined
+
+    // Create first record
+    const firstTransaction = await Transaction.create({
+      ...rest,
+      amount: installmentAmount.toFixed(2),
       userId: user.id,
-      date: DateTime.fromISO(data.date),
+      date: startDate,
+      recurrenceEndAt: parsedRecurrenceEndAt,
+      currentInstallment: 1,
+      totalInstallments: totalInstallments,
+      recurrenceMode: rest.recurrenceMode || (rest.type === 'income' ? 'fixed' : 'installment')
     })
 
-    return response.created(transaction)
+    // Create subsequent records
+    if (totalInstallments > 1) {
+      for (let i = 1; i < totalInstallments; i++) {
+        await Transaction.create({
+          ...rest,
+          amount: installmentAmount.toFixed(2),
+          userId: user.id,
+          date: startDate.plus({ months: i }),
+          recurrenceEndAt: parsedRecurrenceEndAt,
+          currentInstallment: i + 1,
+          totalInstallments: totalInstallments,
+          parentId: firstTransaction.id.toString(),
+          recurrenceMode: rest.recurrenceMode || (rest.type === 'income' ? 'fixed' : 'installment')
+        })
+      }
+    }
+
+    return response.created(firstTransaction)
   }
 
   /**
@@ -50,12 +109,13 @@ export default class TransactionsController {
       .where('userId', user.id)
       .firstOrFail()
 
-    const data = await request.validateUsing(createTransactionValidator)
+    const { recurrenceEndAt, date, ...rest } = await request.validateUsing(createTransactionValidator)
     
     transaction.merge({
-      ...data,
-      amount: data.amount.toString(),
-      date: DateTime.fromISO(data.date),
+      ...rest,
+      amount: rest.amount.toString(),
+      date: DateTime.fromISO(date),
+      recurrenceEndAt: recurrenceEndAt ? DateTime.fromISO(recurrenceEndAt) : undefined,
     })
     
     await transaction.save()
@@ -65,14 +125,29 @@ export default class TransactionsController {
   /**
    * Delete a transaction
    */
-  async destroy({ auth, params, response }: HttpContext) {
+  async destroy({ auth, params, request, response }: HttpContext) {
     const user = auth.user!
+    const deleteAll = request.input('deleteAll') === 'true'
+    
     const transaction = await Transaction.query()
       .where('id', params.id)
       .where('userId', user.id)
       .firstOrFail()
 
-    await transaction.delete()
+    if (deleteAll && (transaction.parentId || (transaction.totalInstallments && transaction.totalInstallments > 1))) {
+      const parentId = transaction.parentId || transaction.id.toString()
+      
+      // Delete parent and all children
+      await Transaction.query()
+        .where('userId', user.id)
+        .where((q) => {
+          q.where('parentId', parentId).orWhere('id', parentId)
+        })
+        .update({ deletedAt: DateTime.now() })
+    } else {
+      await transaction.softDelete()
+    }
+
     return response.noContent()
   }
 }
