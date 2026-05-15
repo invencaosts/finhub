@@ -10,7 +10,7 @@ const navItems = [
 
 export function Sidebar() {
   return (
-    <nav className="hidden md:flex flex-col h-screen w-72 py-8 fixed left-0 top-0 z-50 bg-surface/30 backdrop-blur-2xl border-r border-white/5 shadow-2xl">
+    <nav className="hidden md:flex flex-col h-screen w-72 py-8 fixed left-0 top-0 z-50 bg-card border-r border-border shadow-2xl">
       <div className="px-8 mb-12">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-tertiary to-primary flex items-center justify-center shadow-[0_0_15px_rgba(60,221,199,0.3)]">

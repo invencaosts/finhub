@@ -1,41 +1,57 @@
-import { Search, Notifications, History } from 'lucide-react'
+import { ProfileMenu } from './profile-menu'
+import Link from 'next/link'
 
 export function Header() {
   return (
-    <header className="flex justify-between items-center px-8 py-4 w-full z-40 bg-background/40 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] sticky top-0">
-      {/* Mobile Brand */}
-      <div className="md:hidden flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-tertiary to-primary flex items-center justify-center">
-          <span className="font-bold text-xs text-on-tertiary">A</span>
-        </div>
-        <span className="text-lg font-bold text-on-surface tracking-tight">Aura Finance</span>
-      </div>
+    <header
+      className="sticky top-0 z-40 w-full"
+      style={{
+        background: 'linear-gradient(180deg, rgba(5,20,36,0.85) 0%, rgba(5,20,36,0) 100%)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
 
-      {/* Search (Desktop) */}
-      <div className="hidden md:flex items-center bg-white/5 rounded-full px-4 py-2 border border-white/10 w-64 focus-within:ring-2 focus-within:ring-tertiary/50 transition-all">
-        <span className="material-symbols-outlined text-on-surface/50 mr-2 text-xl">search</span>
-        <input 
-          className="bg-transparent border-none outline-none text-sm text-on-surface placeholder:text-on-surface/40 w-full p-0" 
-          placeholder="Search..." 
-          type="text"
-        />
-      </div>
+        {/* Brand */}
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #3cddc7 0%, #28a896 100%)',
+              boxShadow: '0 4px 16px rgba(60,221,199,0.3)',
+            }}
+          >
+            <span className="material-symbols-rounded text-[18px] font-black" style={{ color: '#003731', fontVariationSettings: "'FILL' 1" }}>
+              account_balance_wallet
+            </span>
+          </div>
+          <div className="leading-none">
+            <span className="block text-base font-black tracking-tight text-on-surface">FinHub</span>
+            <span className="block text-[9px] font-bold tracking-[0.18em] uppercase" style={{ color: '#3cddc7' }}>
+              Finance
+            </span>
+          </div>
+        </Link>
 
-      {/* Actions */}
-      <div className="flex items-center gap-4">
-        <button className="text-on-surface/60 hover:text-tertiary transition-colors duration-300 p-1">
-          <span className="material-symbols-outlined">notifications</span>
-        </button>
-        <button className="text-on-surface/60 hover:text-tertiary transition-colors duration-300 p-1 hidden sm:block">
-          <span className="material-symbols-outlined">history</span>
-        </button>
-        <button className="w-8 h-8 rounded-full border border-white/20 overflow-hidden hover:ring-2 hover:ring-tertiary/50 transition-all">
-          <img 
-            src="https://avatar.vercel.sh/aura" 
-            alt="Profile" 
-            className="w-full h-full object-cover"
-          />
-        </button>
+        {/* Navigation */}
+        <nav className="flex items-center gap-1">
+          <Link
+            href="/history"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-white/5"
+            style={{ color: 'rgba(212,228,250,0.55)' }}
+          >
+            <span className="material-symbols-rounded text-[18px]" style={{ fontVariationSettings: "'FILL' 0" }}>
+              history
+            </span>
+            <span className="hidden sm:inline" style={{ color: 'rgba(212,228,250,0.55)' }}>Histórico</span>
+          </Link>
+
+          <div className="w-px h-5 mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
+
+          <ProfileMenu />
+        </nav>
       </div>
     </header>
   )
