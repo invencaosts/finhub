@@ -8,6 +8,7 @@ export type ScannedRoutes = {
     'auth.login': { paramsTuple?: []; params?: {} }
     'auth.me': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
+    'auth.update_profile': { paramsTuple?: []; params?: {} }
     'transactions.index': { paramsTuple?: []; params?: {} }
     'transactions.store': { paramsTuple?: []; params?: {} }
     'transactions.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -51,6 +52,7 @@ export type ScannedRoutes = {
     'categories.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {
+    'auth.update_profile': { paramsTuple?: []; params?: {} }
     'transactions.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_cards.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'categories.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

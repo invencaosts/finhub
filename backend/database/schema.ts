@@ -33,12 +33,14 @@ export class AuthAccessTokenSchema extends BaseModel {
 }
 
 export class CardInvoiceSchema extends BaseModel {
-  static $columns = ['createdAt', 'creditCardId', 'id', 'month', 'updatedAt', 'userId', 'value', 'year'] as const
+  static $columns = ['createdAt', 'creditCardId', 'deletedAt', 'id', 'month', 'updatedAt', 'userId', 'value', 'year'] as const
   $columns = CardInvoiceSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
   @column()
   declare creditCardId: number | null
+  @column.dateTime()
+  declare deletedAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -54,12 +56,14 @@ export class CardInvoiceSchema extends BaseModel {
 }
 
 export class CategorySchema extends BaseModel {
-  static $columns = ['color', 'createdAt', 'icon', 'id', 'name', 'updatedAt', 'userId'] as const
+  static $columns = ['color', 'createdAt', 'deletedAt', 'icon', 'id', 'name', 'updatedAt', 'userId'] as const
   $columns = CategorySchema.$columns
   @column()
   declare color: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
+  @column.dateTime()
+  declare deletedAt: DateTime | null
   @column()
   declare icon: string | null
   @column({ isPrimary: true })
@@ -73,12 +77,14 @@ export class CategorySchema extends BaseModel {
 }
 
 export class CreditCardSchema extends BaseModel {
-  static $columns = ['bankName', 'createdAt', 'dueDay', 'id', 'limit', 'name', 'updatedAt', 'userId'] as const
+  static $columns = ['bankName', 'createdAt', 'deletedAt', 'dueDay', 'id', 'limit', 'name', 'updatedAt', 'userId'] as const
   $columns = CreditCardSchema.$columns
   @column()
   declare bankName: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
+  @column.dateTime()
+  declare deletedAt: DateTime | null
   @column()
   declare dueDay: number
   @column({ isPrimary: true })
@@ -94,10 +100,12 @@ export class CreditCardSchema extends BaseModel {
 }
 
 export class MonthPeriodSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'incomeGoal', 'month', 'updatedAt', 'userId', 'year'] as const
+  static $columns = ['createdAt', 'deletedAt', 'id', 'incomeGoal', 'month', 'updatedAt', 'userId', 'year'] as const
   $columns = MonthPeriodSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
+  @column.dateTime()
+  declare deletedAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -113,7 +121,7 @@ export class MonthPeriodSchema extends BaseModel {
 }
 
 export class TransactionSchema extends BaseModel {
-  static $columns = ['amount', 'bankName', 'categoryId', 'createdAt', 'creditCardId', 'currentInstallment', 'date', 'description', 'id', 'totalInstallments', 'type', 'updatedAt', 'userId'] as const
+  static $columns = ['amount', 'bankName', 'categoryId', 'createdAt', 'creditCardId', 'currentInstallment', 'date', 'deletedAt', 'description', 'frequency', 'id', 'isRecurring', 'parentId', 'recurrenceEndAt', 'recurrenceMode', 'totalInstallments', 'type', 'updatedAt', 'userId'] as const
   $columns = TransactionSchema.$columns
   @column()
   declare amount: string
@@ -129,10 +137,22 @@ export class TransactionSchema extends BaseModel {
   declare currentInstallment: number | null
   @column.date()
   declare date: DateTime
+  @column.dateTime()
+  declare deletedAt: DateTime | null
   @column()
   declare description: string
+  @column()
+  declare frequency: string | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare isRecurring: boolean | null
+  @column()
+  declare parentId: string | null
+  @column.date()
+  declare recurrenceEndAt: DateTime | null
+  @column()
+  declare recurrenceMode: string | null
   @column()
   declare totalInstallments: number | null
   @column()

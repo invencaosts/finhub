@@ -59,7 +59,7 @@ export default class CreditCardsController {
       .where('userId', user.id)
       .firstOrFail()
 
-    await card.delete()
+    await card.softDelete()
     return response.noContent()
   }
 }

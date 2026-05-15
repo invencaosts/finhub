@@ -12,6 +12,7 @@ export default class extends BaseSeeder {
       { name: 'Assinaturas', color: '#AF52DE', icon: 'subscriptions' },
       { name: 'Essencial', color: '#34C759', icon: 'home' },
       { name: 'Investimento', color: '#32D74B', icon: 'trending_up' },
+      { name: 'Trabalho', color: '#007AFF', icon: 'work' },
       { name: 'Outros', color: '#8E8E93', icon: 'more_horiz' },
     ])
   }

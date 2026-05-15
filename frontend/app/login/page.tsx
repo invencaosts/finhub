@@ -1,6 +1,5 @@
 "use client"
 
-import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,87 +19,207 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    
     try {
       await login({ email, password })
       router.push("/")
     } catch (err: any) {
-      setError(err.response?.data?.message || "Erro ao fazer login. Verifique suas credenciais.")
+      setError(err.response?.data?.message || "Credenciais inválidas. Tente novamente.")
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative">
-      <div className="bg-blob blob-1"></div>
-      <div className="bg-blob blob-2"></div>
-      
-      <GlassCard className="w-full max-w-md p-8">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-tertiary to-primary flex items-center justify-center shadow-[0_0_20px_rgba(60,221,199,0.3)]">
-              <span className="font-bold text-lg text-on-tertiary">A</span>
-            </div>
-            <div className="text-left">
-              <h1 className="text-3xl font-black text-on-surface tracking-tight leading-none">AURA</h1>
-              <span className="text-xs uppercase tracking-[0.2em] text-tertiary font-bold">FINANCE</span>
-            </div>
+    <div className="min-h-screen flex">
+
+      {/* Left panel — brand (hidden on mobile) */}
+      <div
+        className="hidden lg:flex lg:w-1/2 flex-col justify-between p-14 relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(145deg, rgba(18,33,49,0.9) 0%, rgba(5,20,36,1) 100%)',
+          borderRight: '1px solid rgba(255,255,255,0.05)',
+        }}
+      >
+        {/* Decorative orbs */}
+        <div
+          className="absolute top-[-80px] left-[-80px] w-[420px] h-[420px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(60,221,199,0.12) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+        />
+        <div
+          className="absolute bottom-[-60px] right-[-60px] w-[320px] h-[320px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(190,198,224,0.1) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+        />
+
+        {/* Logo */}
+        <div className="relative z-10 flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, #3cddc7 0%, #28a896 100%)',
+              boxShadow: '0 4px 16px rgba(60,221,199,0.3)',
+            }}
+          >
+            <span className="material-symbols-rounded text-[20px]" style={{ color: '#003731', fontVariationSettings: "'FILL' 1" }}>
+              account_balance_wallet
+            </span>
           </div>
-          <p className="text-on-surface/60 text-sm">Bem-vindo de volta ao futuro das suas finanças.</p>
+          <div className="leading-none">
+            <span className="block text-lg font-black tracking-tight" style={{ color: '#d4e4fa' }}>FinHub</span>
+            <span className="block text-[9px] font-bold tracking-[0.18em] uppercase" style={{ color: '#3cddc7' }}>Finance</span>
+          </div>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 rounded-lg bg-error/10 border border-error/20 text-error text-sm text-center">
-            {error}
+        {/* Center content */}
+        <div className="relative z-10 space-y-8">
+          <div>
+            <h2 className="text-4xl font-black tracking-tight leading-tight mb-4" style={{ color: '#d4e4fa' }}>
+              Controle total<br />
+              <span style={{ color: '#3cddc7' }}>das suas finanças.</span>
+            </h2>
+            <p className="text-sm leading-relaxed" style={{ color: 'rgba(212,228,250,0.45)' }}>
+              Visualize entradas, saídas e cartões de crédito em um painel elegante e intuitivo. Tome decisões financeiras com clareza.
+            </p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              placeholder="seu@email.com" 
-              className="bg-white/5 border-white/10 h-12"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+          {/* Feature list */}
+          <div className="space-y-3">
+            {[
+              { icon: 'insights', label: 'Análises financeiras em tempo real' },
+              { icon: 'credit_card', label: 'Gestão de múltiplos cartões' },
+              { icon: 'calendar_month', label: 'Visão mês a mês completa' },
+            ].map(({ icon, label }) => (
+              <div key={icon} className="flex items-center gap-3">
+                <div
+                  className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(60,221,199,0.1)', border: '1px solid rgba(60,221,199,0.15)' }}
+                >
+                  <span className="material-symbols-rounded text-[16px]" style={{ color: '#3cddc7', fontVariationSettings: "'FILL' 1" }}>
+                    {icon}
+                  </span>
+                </div>
+                <span className="text-sm font-semibold" style={{ color: 'rgba(212,228,250,0.6)' }}>{label}</span>
+              </div>
+            ))}
           </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <Label htmlFor="password">Senha</Label>
-              <Link href="#" className="text-xs text-tertiary hover:underline">Esqueceu a senha?</Link>
+        </div>
+
+        {/* Bottom */}
+        <p className="relative z-10 text-[11px]" style={{ color: 'rgba(212,228,250,0.2)' }}>
+          © 2026 FinHub Finance. Uso pessoal.
+        </p>
+      </div>
+
+      {/* Right panel — form */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-sm space-y-8">
+
+          {/* Mobile logo */}
+          <div className="flex lg:hidden items-center gap-3 justify-center">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #3cddc7 0%, #28a896 100%)',
+                boxShadow: '0 4px 16px rgba(60,221,199,0.3)',
+              }}
+            >
+              <span className="material-symbols-rounded text-[20px]" style={{ color: '#003731', fontVariationSettings: "'FILL' 1" }}>
+                account_balance_wallet
+              </span>
             </div>
-            <Input 
-              id="password" 
-              type="password" 
-              className="bg-white/5 border-white/10 h-12"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="leading-none">
+              <span className="block text-lg font-black tracking-tight" style={{ color: '#d4e4fa' }}>FinHub</span>
+              <span className="block text-[9px] font-bold tracking-[0.18em] uppercase" style={{ color: '#3cddc7' }}>Finance</span>
+            </div>
           </div>
 
-          <Button 
-            type="submit" 
-            disabled={isLoading}
-            className="w-full h-12 bg-gradient-to-r from-tertiary to-tertiary/80 text-on-tertiary font-bold text-md shadow-[0_4px_20px_rgba(60,221,199,0.3)] hover:shadow-[0_6px_25px_rgba(60,221,199,0.4)] transition-all disabled:opacity-50"
-          >
-            {isLoading ? "Entrando..." : "Entrar"}
-          </Button>
-        </form>
+          <div>
+            <h1 className="text-2xl font-black tracking-tight mb-1" style={{ color: '#d4e4fa' }}>
+              Bem-vindo de volta
+            </h1>
+            <p className="text-sm" style={{ color: 'rgba(212,228,250,0.4)' }}>
+              Entre na sua conta para continuar.
+            </p>
+          </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-on-surface/60">
-            Não tem uma conta?{" "}
-            <Link href="/register" className="text-tertiary font-bold hover:underline">
-              Crie agora
+          {error && (
+            <div
+              className="px-4 py-3 rounded-xl text-sm"
+              style={{
+                background: 'rgba(255,180,171,0.08)',
+                border: '1px solid rgba(255,180,171,0.2)',
+                color: '#ffb4ab',
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-[0.1em]" style={{ color: 'rgba(212,228,250,0.4)' }}>
+                E-mail
+              </label>
+              <input
+                type="email"
+                placeholder="seu@email.com"
+                className="input-standard"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold uppercase tracking-[0.1em]" style={{ color: 'rgba(212,228,250,0.4)' }}>
+                  Senha
+                </label>
+                <Link href="#" className="text-[11px] font-semibold" style={{ color: '#3cddc7' }}>
+                  Esqueceu?
+                </Link>
+              </div>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="input-standard"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary w-full mt-2"
+              style={{ opacity: isLoading ? 0.7 : 1 }}
+            >
+              {isLoading ? (
+                <>
+                  <div
+                    className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
+                    style={{ borderColor: 'rgba(0,55,49,0.4)', borderTopColor: 'transparent' }}
+                  />
+                  Entrando…
+                </>
+              ) : 'Entrar na conta'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm" style={{ color: 'rgba(212,228,250,0.35)' }}>
+            Não tem uma conta?{' '}
+            <Link href="/register" className="font-bold" style={{ color: '#3cddc7' }}>
+              Criar agora
             </Link>
           </p>
         </div>
-      </GlassCard>
+      </div>
     </div>
   )
 }

@@ -9,8 +9,8 @@ const hankenGrotesk = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Aura Finance - Dashboard",
-  description: "Controle financeiro pessoal inteligente com design premium.",
+  title: "FinHub — Controle Financeiro",
+  description: "Controle financeiro pessoal com design premium e análises inteligentes.",
 };
 
 export default function RootLayout({
@@ -21,17 +21,22 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="dark h-full antialiased">
       <head>
-        <link 
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" 
-          rel="stylesheet" 
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+          rel="stylesheet"
         />
       </head>
       <body
-        className={`${hankenGrotesk.variable} font-hanken min-h-full bg-background text-foreground selection:bg-tertiary/30 selection:text-tertiary relative overflow-x-hidden`}
+        className={`${hankenGrotesk.variable} font-hanken min-h-full bg-background text-on-surface relative overflow-x-hidden`}
       >
-        <div className="bg-blob blob-1"></div>
-        <div className="bg-blob blob-2"></div>
-        {children}
+        {/* Ambient background blobs */}
+        <div className="bg-blob blob-1" />
+        <div className="bg-blob blob-2" />
+        <div className="bg-blob blob-3" />
+
+        <div className="relative z-10">
+          {children}
+        </div>
       </body>
     </html>
   );

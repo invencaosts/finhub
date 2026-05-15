@@ -26,6 +26,7 @@ router
       router.post('login', [AuthController, 'login'])
       router.get('me', [AuthController, 'me']).use(middleware.auth())
       router.post('logout', [AuthController, 'logout']).use(middleware.auth())
+      router.put('profile', [AuthController, 'updateProfile']).use(middleware.auth())
     }).prefix('auth')
 
     // Finance Routes

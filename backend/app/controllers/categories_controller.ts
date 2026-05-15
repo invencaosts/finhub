@@ -41,7 +41,7 @@ export default class CategoriesController {
       .where('userId', user.id) // Only allow deleting own categories
       .firstOrFail()
 
-    await category.delete()
+    await category.softDelete()
     return response.noContent()
   }
 }
