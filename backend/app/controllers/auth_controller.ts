@@ -6,30 +6,28 @@ export default class AuthController {
   /**
    * Register a new user
    */
-  async register({ request, response }: HttpContext) {
+  async register({ request, auth, response }: HttpContext) {
     const data = await request.validateUsing(registerValidator)
     const user = await User.create(data)
 
-    const token = await User.accessTokens.create(user)
+    await auth.use('web').login(user)
 
     return response.created({
       user,
-      token: token.value!.release(),
     })
   }
 
   /**
    * Login a user
    */
-  async login({ request, response }: HttpContext) {
+  async login({ request, auth, response }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
     
     const user = await User.verifyCredentials(email, password)
-    const token = await User.accessTokens.create(user)
+    await auth.use('web').login(user)
 
     return response.ok({
       user,
-      token: token.value!.release(),
     })
   }
 
@@ -37,7 +35,6 @@ export default class AuthController {
    * Get the current user
    */
   async me({ auth, response }: HttpContext) {
-    await auth.check()
     return response.ok(auth.user)
   }
 
@@ -45,10 +42,22 @@ export default class AuthController {
    * Logout a user
    */
   async logout({ auth, response }: HttpContext) {
-    const user = auth.user!
-    if (user.currentAccessToken) {
-      await User.accessTokens.delete(user, user.currentAccessToken.identifier)
-    }
+    await auth.use('web').logout()
     return response.ok({ message: 'Logged out successfully' })
+  }
+
+  /**
+   * Update user profile
+   */
+  async updateProfile({ auth, request, response }: HttpContext) {
+    const user = auth.user!
+    const data = request.only(['fullName', 'email', 'password'])
+
+    if (data.fullName) user.fullName = data.fullName
+    if (data.email) user.email = data.email
+    if (data.password) user.password = data.password
+
+    await user.save()
+    return response.ok(user)
   }
 }
